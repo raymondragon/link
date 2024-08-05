@@ -52,19 +52,14 @@ func runServer(parsedURL *url.URL) error {
             continue
         }
         go func() {
+            defer linkConn.Close()
             serverConn, err := serverListen.Accept()
             if err != nil {
-                linkConn.Close()
                 return
             }
-            go func() {
-                io.Copy(serverConn, linkConn)
-                serverConn.Close()
-            }()
-            go func() {
-                io.Copy(linkConn, serverConn)
-                linkConn.Close()
-            }()
+            defer serverConn.Close()
+            go io.Copy(serverConn, linkConn)
+            go io.Copy(linkConn, serverConn)
         }()
     }
 }
@@ -82,13 +77,15 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     defer linkConn.Close()
+    done := make(chan struct{})
     go func() {
         io.Copy(clientConn, linkConn)
-        clientConn.Close()
+        done <- struct{}{}
     }()
     go func() {
         io.Copy(linkConn, clientConn)
-        linkConn.Close()
+        done <- struct{}{}
     }()
-    select {}
+    <-done
+    return nil
 }
