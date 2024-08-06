@@ -6,6 +6,7 @@ import (
     "net"
     "net/url"
     "os"
+    "time"
 )
 
 func main() {
@@ -51,15 +52,20 @@ func runServer(parsedURL *url.URL) error {
         if err != nil {
             continue
         }
+        serverConn, err := serverListen.Accept()
+        if err != nil {
+            linkConn.Close()
+            continue
+        }
         go func() {
             defer linkConn.Close()
-            serverConn, err := serverListen.Accept()
-            if err != nil {
-                return
-            }
             defer serverConn.Close()
-            go io.Copy(serverConn, linkConn)
-            go io.Copy(linkConn, serverConn)
+            io.Copy(serverConn, linkConn)
+        }()
+        go func() {
+            defer linkConn.Close()
+            defer serverConn.Close()
+            io.Copy(linkConn, serverConn)
         }()
     }
 }
@@ -67,25 +73,27 @@ func runServer(parsedURL *url.URL) error {
 func runClient(parsedURL *url.URL) error {
     linkAddr := parsedURL.Host
     clientAddr := parsedURL.Fragment
-    clientConn, err := net.Dial("tcp", clientAddr)
-    if err != nil {
-        return err
+    for {
+        linkConn, err := net.Dial("tcp", linkAddr)
+        if err != nil {
+            time.Sleep(1 * time.Second)
+            continue
+        }
+        clientConn, err := net.Dial("tcp", clientAddr)
+        if err != nil {
+            linkConn.Close()
+            time.Sleep(1 * time.Second)
+            continue
+        }
+        go func() {
+            defer linkConn.Close()
+            defer clientConn.Close()
+            io.Copy(linkConn, clientConn)
+        }()
+        go func() {
+            defer linkConn.Close()
+            defer clientConn.Close()
+            io.Copy(clientConn, linkConn)
+        }()
     }
-    defer clientConn.Close()
-    linkConn, err := net.Dial("tcp", linkAddr)
-    if err != nil {
-        return err
-    }
-    defer linkConn.Close()
-    done := make(chan struct{})
-    go func() {
-        io.Copy(clientConn, linkConn)
-        done <- struct{}{}
-    }()
-    go func() {
-        io.Copy(linkConn, clientConn)
-        done <- struct{}{}
-    }()
-    <-done
-    return nil
 }
