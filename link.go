@@ -90,4 +90,5 @@ func runClient(parsedURL *url.URL) error {
         }()
     }()
     <-make(chan struct{})
+    return nil
 }
