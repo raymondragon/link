@@ -6,7 +6,6 @@ import (
     "net"
     "net/url"
     "os"
-    "time"
 )
 
 func main() {
@@ -52,50 +51,43 @@ func runServer(parsedURL *url.URL) error {
         if err != nil {
             continue
         }
-        serverConn, err := serverListen.Accept()
-        if err != nil {
-            continue
-        }
         go func() {
-            defer serverConn.Close()
-            defer linkConn.Close()
-            io.Copy(serverConn, linkConn)
+            serverConn, err := serverListen.Accept()
+            if err != nil {
+                return
+            }
+            go func() {
+                io.Copy(serverConn, linkConn)
+                defer serverConn.Close()
+            }()
+            go func() {
+                io.Copy(linkConn, serverConn)
+                defer linkConn.Close()
+            }()
         }()
-        go func() {
-            defer linkConn.Close()
-            defer serverConn.Close()
-            io.Copy(linkConn, serverConn)
-        }()
-        linkConn.Close()
-        serverConn.Close()
     }
 }
 
 func runClient(parsedURL *url.URL) error {
     linkAddr := parsedURL.Host
     clientAddr := parsedURL.Fragment
-    for {
-        linkConn, err := net.Dial("tcp", linkAddr)
-        if err != nil {
-            time.Sleep(1 * time.Second)
-            continue
-        }
-        clientConn, err := net.Dial("tcp", clientAddr)
-        if err != nil {
-            time.Sleep(1 * time.Second)
-            continue
-        }
-        go func() {
-            defer linkConn.Close()
-            defer clientConn.Close()
-            io.Copy(linkConn, clientConn)
-        }()
-        go func() {
-            defer clientConn.Close()
-            defer linkConn.Close()
-            io.Copy(clientConn, linkConn)
-        }()
-        linkConn.Close()
-        clientConn.Close()
+    linkConn, err := net.Dial("tcp", linkAddr)
+    if err != nil {
+        return err
     }
+    clientConn, err := net.Dial("tcp", clientAddr)
+    if err != nil {
+        return err
+    }
+    go func() {
+        go func() {
+            io.Copy(linkConn, clientConn)
+            defer linkConn.Close()
+        }()
+        go func() {
+            io.Copy(clientConn, linkConn)
+            defer clientConn.Close()
+        }()
+    }()
+    <-make(chan struct{})
 }
