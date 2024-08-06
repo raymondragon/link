@@ -56,7 +56,14 @@ func runServer(parsedURL *url.URL) error {
             linkConn.Close()
             continue
         }
-        go handleConnection(linkConn, serverConn)
+        go func() {
+            defer linkConn.Close()
+            io.Copy(linkConn, serverConn)
+        }
+        go func() {
+            defer serverConn.Close()
+            io.Copy(serverConn, linkConn)
+        }
     }
 }
 
@@ -71,13 +78,14 @@ func runClient(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    handleConnection(linkConn, clientConn)
+    go func() {
+        defer linkConn.Close()
+        io.Copy(linkConn, clientConn)
+    }
+    go func() {
+        defer clientConn.Close()
+        io.Copy(clientConn, linkConn)
+    }
     select{}
-}
-
-func handleConnection(conn1, conn2 net.Conn) {
-    defer conn1.Close()
-    defer conn2.Close()
-    go io.Copy(conn1, conn2)
-    go io.Copy(conn2, conn1)
+    return nil
 }
