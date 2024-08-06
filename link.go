@@ -51,19 +51,16 @@ func runServer(parsedURL *url.URL) error {
         if err != nil {
             continue
         }
-        serverConn, err := serverListen.Accept()
-        if err != nil {
-            linkConn.Close()
-            continue
-        }
-        go func() {
+        go func(linkConn net.Conn) {
             defer linkConn.Close()
-            io.Copy(linkConn, serverConn)
-        }()
-        go func() {
+            serverConn, err := serverListen.Accept()
+            if err != nil {
+                return
+            }
             defer serverConn.Close()
-            io.Copy(serverConn, linkConn)
-        }()
+            go io.Copy(linkConn, serverConn)
+            go io.Copy(serverConn, linkConn)
+        }(linkConn)
     }
 }
 
