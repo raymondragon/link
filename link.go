@@ -66,6 +66,8 @@ func runServer(parsedURL *url.URL) error {
             defer serverConn.Close()
             io.Copy(linkConn, serverConn)
         }()
+        linkConn.Close()
+        serverConn.Close()
     }
 }
 
@@ -93,5 +95,7 @@ func runClient(parsedURL *url.URL) error {
             defer linkConn.Close()
             io.Copy(clientConn, linkConn)
         }()
+        linkConn.Close()
+        clientConn.Close()
     }
 }
