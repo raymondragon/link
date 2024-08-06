@@ -85,5 +85,5 @@ func runClient(parsedURL *url.URL) error {
         io.Copy(clientConn, linkConn)
         defer clientConn.Close()
     }()
-    return nil
+    select{}
 }
