@@ -52,23 +52,21 @@ func runServer(parsedURL *url.URL) error {
         if err != nil {
             continue
         }
+        serverConn, err := serverListen.Accept()
+        if err != nil {
+            continue
+        }
+        go func() {
+            defer serverConn.Close()
+            defer linkConn.Close()
+            io.Copy(serverConn, linkConn)
+        }()
         go func() {
             defer linkConn.Close()
-            serverConn, err := serverListen.Accept()
-            if err != nil {
-                return
-            }
             defer serverConn.Close()
-            go func() {
-                defer serverConn.Close()
-                io.Copy(serverConn, linkConn)
-            }()
-            go func() {
-                defer linkConn.Close()
-                io.Copy(linkConn, serverConn)
-            }()
+            io.Copy(linkConn, serverConn)
         }()
-    }
+    }()
 }
 
 func runClient(parsedURL *url.URL) error {
@@ -80,21 +78,20 @@ func runClient(parsedURL *url.URL) error {
             time.Sleep(1 * time.Second)
             continue
         }
+        clientConn, err := net.Dial("tcp", clientAddr)
+        if err != nil {
+            time.Sleep(1 * time.Second)
+            continue
+        }
         go func() {
             defer linkConn.Close()
-            clientConn, err := net.Dial("tcp", clientAddr)
-            if err != nil {
-                return
-            }
             defer clientConn.Close()
-            go func() {
-                defer linkConn.Close()
-                io.Copy(linkConn, clientConn)
-            }()
-            go func() {
-                defer clientConn.Close()
-                io.Copy(clientConn, linkConn)
-            }()
+            io.Copy(linkConn, clientConn)
+        }()
+        go func() {
+            defer clientConn.Close()
+            defer linkConn.Close()
+            io.Copy(clientConn, linkConn)
         }()
     }
 }
