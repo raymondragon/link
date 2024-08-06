@@ -46,22 +46,23 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     defer serverListen.Close()
-    for {
-        linkConn, err := linkListen.Accept()
-        if err != nil {
-            continue
-        }
-        go func() {
-            defer linkConn.Close()
-            serverConn, err := serverListen.Accept()
-            if err != nil {
-                return
-            }
-            defer serverConn.Close()
-            go io.Copy(linkConn, serverConn)
-            go io.Copy(serverConn, linkConn)
-        }()
+    linkConn, err := linkListen.Accept()
+    if err != nil {
+        return err
     }
+    serverConn, err := serverListen.Accept()
+    if err != nil {
+        return err
+    }
+    go func() {
+        defer linkConn.Close()
+        io.Copy(linkConn, serverConn)
+    }()
+    go func() {
+        defer serverConn.Close()
+        io.Copy(serverConn, linkConn)
+    }()
+    select{}
 }
 
 func runClient(parsedURL *url.URL) error {
@@ -84,5 +85,4 @@ func runClient(parsedURL *url.URL) error {
         io.Copy(clientConn, linkConn)
     }()
     select{}
-    return nil
 }
