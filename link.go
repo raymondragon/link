@@ -1,6 +1,7 @@
 package main
 
 import (
+    "errors"
     "io"
     "log"
     "net"
@@ -72,7 +73,7 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     handleConnection(linkConn, clientConn)
-    return nil
+    return errors.New("Client Reloading...")
 }
 
 func handleConnection(conn1, conn2 net.Conn) {
