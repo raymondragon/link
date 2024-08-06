@@ -59,11 +59,11 @@ func runServer(parsedURL *url.URL) error {
         go func() {
             defer linkConn.Close()
             io.Copy(linkConn, serverConn)
-        }
+        }()
         go func() {
             defer serverConn.Close()
             io.Copy(serverConn, linkConn)
-        }
+        }()
     }
 }
 
@@ -81,11 +81,11 @@ func runClient(parsedURL *url.URL) error {
     go func() {
         defer linkConn.Close()
         io.Copy(linkConn, clientConn)
-    }
+    }()
     go func() {
         defer clientConn.Close()
         io.Copy(clientConn, linkConn)
-    }
+    }()
     select{}
     return nil
 }
