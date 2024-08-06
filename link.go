@@ -73,17 +73,22 @@ func runClient(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
+    defer linkConn.Close()
     clientConn, err := net.Dial("tcp", clientAddr)
     if err != nil {
         return err
     }
+    defer clientConn.Close()
+    done := make(chan struct{}, 2)
     go func() {
         io.Copy(linkConn, clientConn)
-        defer linkConn.Close()
+        done <- struct{}{}
     }()
     go func() {
         io.Copy(clientConn, linkConn)
-        defer clientConn.Close()
+        done <- struct{}{}
     }()
-    select{}
+    <-done
+    <-done
+    return nil
 }
