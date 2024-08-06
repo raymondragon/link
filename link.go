@@ -28,7 +28,6 @@ func main() {
         if err := runClient(parsedURL); err != nil {
             log.Fatalf("[ERRO] Client: %v", err)
         }
-        os.Exit(0)
     default:
         log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
     }
@@ -79,16 +78,6 @@ func runClient(parsedURL *url.URL) error {
 func handleConnection(conn1, conn2 net.Conn) {
     defer conn1.Close()
     defer conn2.Close()
-    done1 := make(chan struct{})
-    done2 := make(chan struct{})
-    go func() {
-        io.Copy(conn1, conn2)
-        done1 <- struct{}{}
-    }()
-    go func() {
-        io.Copy(conn2, conn1)
-        done2 <- struct{}{}
-    }()
-    <-done1
-    <-done2
+    io.Copy(conn1, conn2)
+    io.Copy(conn2, conn1)
 }
