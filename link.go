@@ -72,12 +72,12 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     handleConnection(linkConn, clientConn)
-    return nil
+    select{}
 }
 
 func handleConnection(conn1, conn2 net.Conn) {
     defer conn1.Close()
     defer conn2.Close()
-    io.Copy(conn1, conn2)
-    io.Copy(conn2, conn1)
+    go io.Copy(conn1, conn2)
+    go io.Copy(conn2, conn1)
 }
