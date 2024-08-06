@@ -1,7 +1,6 @@
 package main
 
 import (
-    "errors"
     "io"
     "log"
     "net"
@@ -29,6 +28,7 @@ func main() {
         if err := runClient(parsedURL); err != nil {
             log.Fatalf("[ERRO] Client: %v", err)
         }
+        os.Exit(0)
     default:
         log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
     }
@@ -73,7 +73,7 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     handleConnection(linkConn, clientConn)
-    return errors.New("Client Reloading...")
+    return nil
 }
 
 func handleConnection(conn1, conn2 net.Conn) {
