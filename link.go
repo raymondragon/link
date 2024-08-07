@@ -50,6 +50,12 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
+    go func() {
+        _, err := linkConn.Read(make([]byte, 1))
+        if err != nil {
+            os.Exit(1)
+        }
+    }()
     serverConn, err := serverListen.Accept()
     if err != nil {
         return err
