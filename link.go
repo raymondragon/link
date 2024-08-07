@@ -46,15 +46,20 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     defer serverListen.Close()
-    linkConn, err := linkListen.Accept()
-    if err != nil {
-        return err
+    for {
+        linkConn, err := linkListen.Accept()
+        if err != nil {
+            return err
+        }
+        go func() {
+            serverConn, err := serverListen.Accept()
+            if err != nil {
+                linkConn.Close()
+                return
+            }
+            handleConnections(linkConn, serverConn)
+        }()
     }
-    serverConn, err := serverListen.Accept()
-    if err != nil {
-        return err
-    }
-    handleConnections(linkConn, serverConn)
     return nil
 }
 
@@ -70,6 +75,7 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     handleConnections(linkConn, clientConn)
+    os.Exit(1)
     return nil
 }
 
@@ -87,5 +93,4 @@ func handleConnections(conn1, conn2 net.Conn) {
     }()
     <-done
     <-done
-    os.Exit(1)
 }
