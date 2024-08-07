@@ -19,12 +19,12 @@ func main() {
     }
     switch parsedURL.Scheme {
     case "server":
-        log.Printf("[INFO] Linking Server: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
+        log.Printf("[INFO] Server: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
         if err := runServer(parsedURL); err != nil {
             log.Fatalf("[ERRO] Server: %v", err)
         }
     case "client":
-        log.Printf("[INFO] Linking Client: %v --> %v", parsedURL.Host, parsedURL.Fragment)
+        log.Printf("[INFO] Client: %v --> %v", parsedURL.Host, parsedURL.Fragment)
         if err := runClient(parsedURL); err != nil {
             log.Fatalf("[ERRO] Client: %v", err)
         }
@@ -50,12 +50,6 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    go func() {
-        _, err := linkConn.Read(make([]byte, 1))
-        if err != nil {
-            os.Exit(1)
-        }
-    }()
     serverConn, err := serverListen.Accept()
     if err != nil {
         return err
