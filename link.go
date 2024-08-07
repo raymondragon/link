@@ -40,6 +40,7 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
+    defer linkListen.Close()
     serverListen, err := net.Listen("tcp", serverAddr)
     if err != nil {
         return err
@@ -49,13 +50,6 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    linkListen.Close()
-    go func() {
-        _, err := linkConn.Write([]byte{})
-        if err != nil {
-            os.Exit(1)
-        }
-    }()
     serverConn, err := serverListen.Accept()
     if err != nil {
         return err
