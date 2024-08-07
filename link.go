@@ -6,6 +6,7 @@ import (
     "net"
     "net/url"
     "os"
+    "time"
 )
 
 func main() {
@@ -45,6 +46,7 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
+    serverListen.SetDeadline(time.Now().Add(90 * time.Second))
     defer serverListen.Close()
     linkConn, err := linkListen.Accept()
     if err != nil {
