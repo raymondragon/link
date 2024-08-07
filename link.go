@@ -51,7 +51,7 @@ func runServer(parsedURL *url.URL) error {
     }
     linkListen.Close()
     go func() {
-        _, err := conn.Write([]byte{})
+        _, err := linkConn.Write([]byte{})
         if err != nil {
             os.Exit(1)
         }
