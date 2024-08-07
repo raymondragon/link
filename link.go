@@ -54,7 +54,6 @@ func runServer(parsedURL *url.URL) error {
         go func() {
             serverConn, err := serverListen.Accept()
             if err != nil {
-                linkConn.Close()
                 return
             }
             handleConnections(linkConn, serverConn)
