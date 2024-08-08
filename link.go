@@ -23,14 +23,16 @@ func main() {
         case "server":
             log.Printf("[INFO] Server: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
             if err := runServer(parsedURL); err != nil {
-                log.Fatalf("[ERRO] Server: %v", err)
+                log.Printf("[ERRO] Server: %v", err)
+                continue
             }
         case "client":
             log.Printf("[INFO] Client: %v --> %v", parsedURL.Host, parsedURL.Fragment)
             if err := runClient(parsedURL); err != nil {
-                log.Fatalf("[ERRO] Client: %v", err)
+                log.Printf("[ERRO] Client: %v", err)
+                time.Sleep(10 * time.Second)
+                 continue
             }
-            time.Sleep(10 * time.Second)
         default:
             log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
         }
