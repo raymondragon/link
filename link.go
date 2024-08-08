@@ -31,7 +31,7 @@ func main() {
             if err := runClient(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
                 time.Sleep(10 * time.Second)
-                 continue
+                continue
             }
         default:
             log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
