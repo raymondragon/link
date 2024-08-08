@@ -52,11 +52,11 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     defer serverListen.Close()
-    linkConn, err := linkListen.Accept()
+    serverConn, err := serverListen.Accept()
     if err != nil {
         return err
     }
-    serverConn, err := serverListen.Accept()
+    linkConn, err := linkListen.Accept()
     if err != nil {
         return err
     }
