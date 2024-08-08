@@ -71,7 +71,7 @@ func runServer(parsedURL *url.URL) error {
 func runClient(parsedURL *url.URL) error {
     linkAddr := parsedURL.Host
     clientAddr := parsedURL.Fragment
-    linkConn, err = net.Dial("tcp", linkAddr)
+    linkConn, err := net.Dial("tcp", linkAddr)
     if err != nil {
         return err
     }
