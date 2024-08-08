@@ -46,19 +46,16 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     defer serverListen.Close()
-    for {
-        linkConn, err := linkListen.Accept()
-        if err != nil {
-            return err
-        }
-        go func() {
-            serverConn, err := serverListen.Accept()
-            if err != nil {
-                return
-            }
-            handleConnections(linkConn, serverConn)
-        }()
+    linkConn, err := linkListen.Accept()
+    if err != nil {
+        return err
     }
+    serverConn, err := serverListen.Accept()
+    if err != nil {
+        return err
+    }
+    handleConnections(linkConn, serverConn)
+    os.Exit(1)
     return nil
 }
 
