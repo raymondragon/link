@@ -52,16 +52,22 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     defer serverListen.Close()
+    var linkConn net.Conn
+    go func() {
+        for {
+            tempConn, err := linkListen.Accept()
+            if err != nil {
+                continue
+            }
+            if linkConn != nil {
+                linkConn.Close()
+            }
+            linkConn = tempConn
+        }
+    }()
     serverConn, err := serverListen.Accept()
     if err != nil {
         return err
-    }
-    var linkConn net.Conn
-    if _, err := serverConn.Write([]byte("PING")); err != nil {
-        linkConn, err = linkListen.Accept()
-        if err != nil {
-            return err
-        }
     }
     handleConnections(linkConn, serverConn)
     return nil
