@@ -54,11 +54,22 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    serverConn, err := serverListen.Accept()
-    if err != nil {
-        return err
+    timeChan := time.After(1 * time.Minute)
+    doneChan := make(chan struct{})
+    var serverConn net.Conn
+    go func() {
+        defer close(doneChan)
+        var err error
+        serverConn, err = serverListen.Accept()
+        if err != nil {
+            return err
+        }
+    }()
+    select {
+    case <-timeChan:
+    case <-doneChan:
+        handleConnections(linkConn, serverConn)
     }
-    handleConnections(linkConn, serverConn)
     return nil
 }
 
