@@ -24,13 +24,14 @@ func main() {
             log.Printf("[INFO] Link: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
             if err := runServer(parsedURL); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
+                time.Sleep(1 * time.Second)
                 continue
             }
         case "client":
             log.Printf("[INFO] Link: %v --> %v", parsedURL.Host, parsedURL.Fragment)
             if err := runClient(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
-                time.Sleep(1 * time.Minute)
+                time.Sleep(1 * time.Second)
                 continue
             }
         default:
@@ -57,12 +58,14 @@ func runServer(parsedURL *url.URL) error {
         for {
             tempConn, err := linkListen.Accept()
             if err != nil {
+                time.Sleep(1 * time.Second)
                 continue
             }
             if linkConn != nil {
                 linkConn.Close()
             }
             linkConn = tempConn
+            time.Sleep(1 * time.Second)
         }
     }()
     serverConn, err := serverListen.Accept()
