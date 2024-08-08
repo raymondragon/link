@@ -21,16 +21,16 @@ func main() {
     for {
         switch parsedURL.Scheme {
         case "server":
-            log.Printf("[INFO] Server: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
+            log.Printf("[INFO] Link: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
             if err := runServer(parsedURL); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 continue
             }
         case "client":
-            log.Printf("[INFO] Client: %v --> %v", parsedURL.Host, parsedURL.Fragment)
+            log.Printf("[INFO] Link: %v --> %v", parsedURL.Host, parsedURL.Fragment)
             if err := runClient(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
-                time.Sleep(10 * time.Second)
+                time.Sleep(1 * time.Minute)
                 continue
             }
         default:
