@@ -52,11 +52,12 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     defer serverListen.Close()
-    var linkConn net.Conn
     serverConn, err := serverListen.Accept()
     if err != nil {
         return err
-    } else {
+    }
+    var linkConn net.Conn
+    if _, err := serverConn.Write([]byte("PING")); err != nil {
         linkConn, err = linkListen.Accept()
         if err != nil {
             return err
@@ -69,11 +70,12 @@ func runServer(parsedURL *url.URL) error {
 func runClient(parsedURL *url.URL) error {
     linkAddr := parsedURL.Host
     clientAddr := parsedURL.Fragment
-    var clientConn net.Conn
     linkConn, err := net.Dial("tcp", linkAddr)
     if err != nil {
         return err
-    } else {
+    }
+    var clientConn net.Conn
+    if _, err := linkConn.Write([]byte("PING")); err != nil {
         clientConn, err = net.Dial("tcp", clientAddr)
         if err != nil {
             return err
