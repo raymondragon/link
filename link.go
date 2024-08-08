@@ -6,6 +6,7 @@ import (
     "net"
     "net/url"
     "os"
+    "time"
 )
 
 func main() {
@@ -17,19 +18,22 @@ func main() {
     if err != nil {
         log.Fatalf("[ERRO] URL Parsing: %v", err)
     }
-    switch parsedURL.Scheme {
-    case "server":
-        log.Printf("[INFO] Server: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
-        if err := runServer(parsedURL); err != nil {
-            log.Fatalf("[ERRO] Server: %v", err)
+    for {
+        switch parsedURL.Scheme {
+        case "server":
+            log.Printf("[INFO] Server: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
+            if err := runServer(parsedURL); err != nil {
+                log.Fatalf("[ERRO] Server: %v", err)
+            }
+        case "client":
+            log.Printf("[INFO] Client: %v --> %v", parsedURL.Host, parsedURL.Fragment)
+            if err := runClient(parsedURL); err != nil {
+                log.Fatalf("[ERRO] Client: %v", err)
+            }
+            time.Sleep(1 * time.Second)
+        default:
+            log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
         }
-    case "client":
-        log.Printf("[INFO] Client: %v --> %v", parsedURL.Host, parsedURL.Fragment)
-        if err := runClient(parsedURL); err != nil {
-            log.Fatalf("[ERRO] Client: %v", err)
-        }
-    default:
-        log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
     }
 }
 
@@ -55,7 +59,6 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     handleConnections(linkConn, serverConn)
-    os.Exit(1)
     return nil
 }
 
@@ -71,7 +74,6 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     handleConnections(linkConn, clientConn)
-    os.Exit(1)
     return nil
 }
 
