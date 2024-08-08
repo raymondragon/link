@@ -56,9 +56,11 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    linkConn, err := linkListen.Accept()
-    if err != nil {
-        return err
+    if serverConn != nil {
+        linkConn, err := linkListen.Accept()
+        if err != nil {
+            return err
+        }
     }
     handleConnections(linkConn, serverConn)
     return nil
@@ -71,9 +73,11 @@ func runClient(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    clientConn, err := net.Dial("tcp", clientAddr)
-    if err != nil {
-        return err
+    if linkConn != nil {
+        clientConn, err := net.Dial("tcp", clientAddr)
+        if err != nil {
+            return err
+        }
     }
     handleConnections(linkConn, clientConn)
     return nil
