@@ -30,7 +30,7 @@ func main() {
             if err := runClient(parsedURL); err != nil {
                 log.Fatalf("[ERRO] Client: %v", err)
             }
-            time.Sleep(1 * time.Second)
+            time.Sleep(10 * time.Second)
         default:
             log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
         }
@@ -54,18 +54,11 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    timeChan := time.After(1 * time.Minute)
-    doneChan := make(chan struct{})
-    var serverConn net.Conn
-    go func() {
-        defer close(doneChan)
-        serverConn, _ = serverListen.Accept()
-    }()
-    select {
-    case <-timeChan:
-    case <-doneChan:
-        handleConnections(linkConn, serverConn)
+    serverConn, err := serverListen.Accept()
+    if err != nil {
+        return err
     }
+    handleConnections(linkConn, serverConn)
     return nil
 }
 
