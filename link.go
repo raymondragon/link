@@ -59,11 +59,7 @@ func runServer(parsedURL *url.URL) error {
     var serverConn net.Conn
     go func() {
         defer close(doneChan)
-        var err error
-        serverConn, err = serverListen.Accept()
-        if err != nil {
-            return err
-        }
+        serverConn, _ = serverListen.Accept()
     }()
     select {
     case <-timeChan:
