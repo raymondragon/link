@@ -41,22 +41,28 @@ func main() {
 }
 
 func runServer(parsedURL *url.URL) error {
-    linkAddr := parsedURL.Host
-    serverAddr := parsedURL.Fragment
-    linkListen, err := net.Listen("tcp", linkAddr)
+    linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
+    if err != nil {
+        return err
+    }
+    serverAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Fragment)
+    if err != nil {
+        return err
+    }
+    linkListen, err := net.ListenTCP("tcp", linkAddr)
     if err != nil {
         return err
     }
     defer linkListen.Close()
-    serverListen, err := net.Listen("tcp", serverAddr)
+    serverListen, err := net.ListenTCP("tcp", serverAddr)
     if err != nil {
         return err
     }
     defer serverListen.Close()
-    var linkConn net.Conn
+    var linkConn *net.TCPConn
     go func() {
         for {
-            tempConn, err := linkListen.Accept()
+            tempConn, err := linkListen.AcceptTCP()
             if err != nil {
                 time.Sleep(1 * time.Second)
                 continue
@@ -65,13 +71,15 @@ func runServer(parsedURL *url.URL) error {
                 linkConn.Close()
             }
             linkConn = tempConn
+            linkConn.SetNoDelay(true)
             time.Sleep(1 * time.Second)
         }
     }()
-    serverConn, err := serverListen.Accept()
+    serverConn, err := serverListen.AcceptTCP()
     if err != nil {
         return err
     }
+    serverConn.SetNoDelay(true)
     if linkConn == nil {
         serverConn.Close()
         return nil
@@ -81,16 +89,25 @@ func runServer(parsedURL *url.URL) error {
 }
 
 func runClient(parsedURL *url.URL) error {
-    linkAddr := parsedURL.Host
-    clientAddr := parsedURL.Fragment
-    linkConn, err := net.Dial("tcp", linkAddr)
+    linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
     }
-    clientConn, err := net.Dial("tcp", clientAddr)
+    clientAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Fragment)
     if err != nil {
         return err
     }
+    linkConn, err := net.DialTCP("tcp", nil, linkAddr)
+    if err != nil {
+        return err
+    }
+    linkConn.SetNoDelay(true)
+    clientConn, err := net.DialTCP("tcp", nil, clientAddr)
+    if err != nil {
+        linkConn.Close()
+        return err
+    }
+    clientConn.SetNoDelay(true)
     handleConnections(linkConn, clientConn)
     return nil
 }
