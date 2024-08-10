@@ -80,11 +80,10 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     serverConn.SetNoDelay(true)
-    defer serverConn.Close()
     if linkConn == nil {
+        serverConn.Close()
         return nil
     }
-    defer linkConn.Close()
     handleConnections(linkConn, serverConn)
     return nil
 }
@@ -103,13 +102,12 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     linkConn.SetNoDelay(true)
-    defer linkConn.Close()
     clientConn, err := net.DialTCP("tcp", nil, clientAddr)
     if err != nil {
+        linkConn.Close()
         return err
     }
     clientConn.SetNoDelay(true)
-    defer clientConn.Close()
     handleConnections(linkConn, clientConn)
     return nil
 }
@@ -117,10 +115,12 @@ func runClient(parsedURL *url.URL) error {
 func handleConnections(conn1, conn2 net.Conn) {
     done := make(chan struct{}, 2)
     go func() {
+        defer conn1.Close()
         io.Copy(conn1, conn2)
         done <- struct{}{}
     }()
     go func() {
+        defer conn2.Close()
         io.Copy(conn2, conn1)
         done <- struct{}{}
     }()
