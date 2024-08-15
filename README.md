@@ -15,8 +15,8 @@
 To run the program, provide a URL specifying the mode and connection addresses. The URL format is as follows:
 
 ```
-server://linkAddr#targetAddr
-client://linkAddr#targetAddr
+server://linkAddr/targetAddr
+client://linkAddr/targetAddr
 ```
 
 ### Server Mode
@@ -27,7 +27,7 @@ client://linkAddr#targetAddr
 **Run as Server**
 
 ```bash
-./link server://:10101#:10022
+./link server://:10101/:10022
 ```
 
 This command will listen for client connections on port `10101` , listen and forward data to port `10022`.
@@ -40,7 +40,7 @@ This command will listen for client connections on port `10101` , listen and for
 **Run as Client**
 
 ```bash
-./link client://server_ip:10101#127.0.0.1:22
+./link client://server_ip:10101/127.0.0.1:22
 ```
 
 This command will establish link with `server_ip:10101` , connect and forward data to `127.0.0.1:22`.
@@ -49,18 +49,16 @@ This command will establish link with `server_ip:10101` , connect and forward da
 
 You can also run **Link** using a Docker container. The image is available at [ghcr.io/raymondragon/link](https://ghcr.io/raymondragon/link).
 
-### Running with Docker
-
 To run the container in server mode:
 
 ```bash
-docker run --rm ghcr.io/raymondragon/link server://:10101#:10022
+docker run --rm ghcr.io/raymondragon/link server://:10101/:10022
 ```
 
 To run the container in client mode:
 
 ```bash
-docker run --rm ghcr.io/raymondragon/link client://server_ip:10101#127.0.0.1:22
+docker run --rm ghcr.io/raymondragon/link client://server_ip:10101/127.0.0.1:22
 ```
 
 ## License
