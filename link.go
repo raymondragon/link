@@ -10,7 +10,7 @@ import (
 
 func main() {
     if len(os.Args) < 2 {
-        log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
+        log.Fatalf("[ERRO] Usage: server/client://linkAddr/targetAddr")
     }
     rawURL := os.Args[1]
     parsedURL, err := url.Parse(rawURL)
@@ -20,14 +20,14 @@ func main() {
     for {
         switch parsedURL.Scheme {
         case "server":
-            log.Printf("[INFO] Link: %v <-- %v", parsedURL.Host, parsedURL.Fragment)
+            log.Printf("[INFO] %v", parsedURL)
             if err := runServer(parsedURL); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "client":
-            log.Printf("[INFO] Link: %v --> %v", parsedURL.Host, parsedURL.Fragment)
+            log.Printf("[INFO] %v", parsedURL)
             if err := runClient(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
                 time.Sleep(1 * time.Second)
