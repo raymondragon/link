@@ -11,7 +11,7 @@ import (
 
 func main() {
     if len(os.Args) < 2 {
-        log.Fatalf("[ERRO] Usage: server/client://linkAddr/targetAddr")
+        log.Fatalf("[ERRO] Usage: server/client/broker://linkAddr/targetAddr")
     }
     rawURL := os.Args[1]
     parsedURL, err := url.Parse(rawURL)
@@ -19,11 +19,6 @@ func main() {
         log.Fatalf("[ERRO] URL Parsing: %v", err)
     }
     log.Printf("[INFO] %v", parsedURL)
-    if parsedURL.Scheme == "broker" {
-        if err := runBroker(parsedURL); err != nil {
-            log.Printf("[ERRO] Broker: %v", err)
-        }
-    }
     for {
         switch parsedURL.Scheme {
         case "server":
@@ -38,44 +33,15 @@ func main() {
                 time.Sleep(1 * time.Second)
                 continue
             }
-        default:
-            log.Fatalf("[ERRO] Usage: server/client://linkAddr#targetAddr")
-        }
-    }
-}
-
-func runBroker(parsedURL *url.URL) error {
-    linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
-    if err != nil {
-        return err
-    }
-    targetAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
-    if err != nil {
-        return err
-    }
-    linkListen, err := net.ListenTCP("tcp", linkAddr)
-    if err != nil {
-        return err
-    }
-    defer linkListen.Close()
-    semTEMP := make(chan struct{}, 1024)
-    for {
-        linkConn, err := linkListen.AcceptTCP()
-        if err != nil {
-            continue
-        }
-        linkConn.SetNoDelay(true)
-        semTEMP <- struct{}{}
-        go func(linkConn net.Conn) {
-            defer func() { <-semTEMP }()
-            targetConn, err := net.DialTCP("tcp", nil, targetAddr)
-            if err != nil {
-                linkConn.Close()
-                return
+        case "broker":
+            if err := runBroker(parsedURL); err != nil {
+                log.Printf("[ERRO] Broker: %v", err)
+                time.Sleep(1 * time.Second)
+                continue
             }
-            targetConn.SetNoDelay(true)
-            handleConnections(linkConn, targetConn)
-        }(linkConn)
+        default:
+            log.Fatalf("[ERRO] Usage: server/client/broker://linkAddr/targetAddr")
+        }
     }
 }
 
@@ -149,4 +115,39 @@ func runClient(parsedURL *url.URL) error {
     targetConn.SetNoDelay(true)
     handleConnections(linkConn, targetConn)
     return nil
+}
+
+func runBroker(parsedURL *url.URL) error {
+    linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
+    if err != nil {
+        return err
+    }
+    targetAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
+    if err != nil {
+        return err
+    }
+    linkListen, err := net.ListenTCP("tcp", linkAddr)
+    if err != nil {
+        return err
+    }
+    defer linkListen.Close()
+    semTEMP := make(chan struct{}, 1024)
+    for {
+        linkConn, err := linkListen.AcceptTCP()
+        if err != nil {
+            continue
+        }
+        linkConn.SetNoDelay(true)
+        semTEMP <- struct{}{}
+        go func(linkConn net.Conn) {
+            defer func() { <-semTEMP }()
+            targetConn, err := net.DialTCP("tcp", nil, targetAddr)
+            if err != nil {
+                linkConn.Close()
+                return
+            }
+            targetConn.SetNoDelay(true)
+            handleConnections(linkConn, targetConn)
+        }(linkConn)
+    }
 }
