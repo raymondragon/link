@@ -5,6 +5,7 @@ import (
     "net"
     "net/url"
     "os"
+    "strings"
     "time"
 )
 
@@ -44,7 +45,7 @@ func runServer(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    serverAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Fragment)
+    serverAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
     if err != nil {
         return err
     }
@@ -92,7 +93,7 @@ func runClient(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    clientAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Fragment)
+    clientAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
     if err != nil {
         return err
     }
