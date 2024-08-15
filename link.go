@@ -56,7 +56,7 @@ func runBroker(parsedURL *url.URL) error {
     defer linkListen.Close()
     semTEMP := make(chan struct{}, 1024)
     for {
-        linkConn, err := linkListen.Accept()
+        linkConn, err := linkListen.AcceptTCP()
         if err != nil {
             continue
         }
@@ -64,7 +64,7 @@ func runBroker(parsedURL *url.URL) error {
         semTEMP <- struct{}{}
         go func(linkConn net.Conn) {
             defer func() { <-semTEMP }()
-            targetConn, err := net.Dial("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
+            targetConn, err := net.DialTCP("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
             if err != nil {
                 linkConn.Close()
                 return
