@@ -18,17 +18,21 @@ func main() {
     if err != nil {
         log.Fatalf("[ERRO] URL Parsing: %v", err)
     }
+    log.Printf("[INFO] %v", parsedURL)
+    if parsedURL.Scheme == "broker" {
+        if err := runBroker(parsedURL); err != nil {
+            log.Printf("[ERRO] Broker: %v", err)
+        }
+    }
     for {
         switch parsedURL.Scheme {
         case "server":
-            log.Printf("[INFO] %v", parsedURL)
             if err := runServer(parsedURL); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "client":
-            log.Printf("[INFO] %v", parsedURL)
             if err := runClient(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
                 time.Sleep(1 * time.Second)
@@ -40,12 +44,8 @@ func main() {
     }
 }
 
-func runServer(parsedURL *url.URL) error {
+func runBroker(parsedURL *url.URL) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
-    if err != nil {
-        return err
-    }
-    serverAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
     if err != nil {
         return err
     }
@@ -54,11 +54,46 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     defer linkListen.Close()
-    serverListen, err := net.ListenTCP("tcp", serverAddr)
+    semTEMP := make(chan struct{}, 1024)
+    for {
+        linkConn, err := linkListen.Accept()
+        if err != nil {
+            continue
+        }
+        linkConn.SetNoDelay(true)
+        semTEMP <- struct{}{}
+        go func(linkConn net.Conn) {
+            defer func() { <-semTEMP }()
+            targetConn, err := net.Dial("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
+            if err != nil {
+                linkConn.Close()
+                return
+            }
+            targetConn.SetNoDelay(true)
+            handleConnections(linkConn, targetConn)
+        }(linkConn)
+    }
+}
+
+func runServer(parsedURL *url.URL) error {
+    linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
     }
-    defer serverListen.Close()
+    targetAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
+    if err != nil {
+        return err
+    }
+    linkListen, err := net.ListenTCP("tcp", linkAddr)
+    if err != nil {
+        return err
+    }
+    defer linkListen.Close()
+    targetListen, err := net.ListenTCP("tcp", targetAddr)
+    if err != nil {
+        return err
+    }
+    defer targetListen.Close()
     var linkConn *net.TCPConn
     go func() {
         for {
@@ -75,16 +110,16 @@ func runServer(parsedURL *url.URL) error {
             time.Sleep(1 * time.Second)
         }
     }()
-    serverConn, err := serverListen.AcceptTCP()
+    targetConn, err := targetListen.AcceptTCP()
     if err != nil {
         return err
     }
-    serverConn.SetNoDelay(true)
+    targetConn.SetNoDelay(true)
     if linkConn == nil {
-        serverConn.Close()
+        targetConn.Close()
         return nil
     }
-    handleConnections(linkConn, serverConn)
+    handleConnections(linkConn, targetConn)
     return nil
 }
 
@@ -93,7 +128,7 @@ func runClient(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    clientAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
+    targetAddr, err := net.ResolveTCPAddr("tcp", strings.TrimPrefix(parsedURL.Path, "/"))
     if err != nil {
         return err
     }
@@ -102,12 +137,12 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     linkConn.SetNoDelay(true)
-    clientConn, err := net.DialTCP("tcp", nil, clientAddr)
+    targetConn, err := net.DialTCP("tcp", nil, targetAddr)
     if err != nil {
         linkConn.Close()
         return err
     }
-    clientConn.SetNoDelay(true)
-    handleConnections(linkConn, clientConn)
+    targetConn.SetNoDelay(true)
+    handleConnections(linkConn, targetConn)
     return nil
 }
