@@ -48,13 +48,15 @@ func runServer(parsedURL *url.URL, ipStore *sync.Map) error {
         return err
     }
     targetConn.SetNoDelay(true)
-    clientIP, _, err := net.SplitHostPort(targetConn.RemoteAddr().String())
-    if err != nil {
-        return err
-    }
-    if _, exists := ipStore.Load(clientIP); !exists || linkConn == nil {
-        targetConn.Close()
-        return nil
+    if parsedURL.Fragment != "" {
+        clientIP, _, err := net.SplitHostPort(targetConn.RemoteAddr().String())
+        if err != nil {
+            return err
+        }
+        if _, exists := ipStore.Load(clientIP); !exists || linkConn == nil {
+            targetConn.Close()
+            return nil
+        }
     }
     handleTransmissions(linkConn, targetConn)
     return nil
