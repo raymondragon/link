@@ -16,8 +16,6 @@
 
 - **Service Forwarding**: Efficiently manage and redirect TCP connections from one service to entrypoints everywhere.
 
-- **No External Dependencies**: Entirely built using Go's standard library, ensuring a lightweight and efficient solution.
-
 ## Usage
 
 To run the program, provide a URL specifying the mode and connection addresses. The URL format is as follows:
