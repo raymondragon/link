@@ -9,6 +9,8 @@ import (
     "time"
 )
 
+var authorizedIP sync.Map
+
 func main() {
     if len(os.Args) < 2 {
         log.Fatalf("[ERRO] Usage: server/client/broker://linkAddr/targetAddr#http/https://authAddr/secretPath")
@@ -18,7 +20,6 @@ func main() {
     if err != nil {
         log.Fatalf("[ERRO] URL Parsing: %v", err)
     }
-    var ipStore sync.Map
     if parsedURL.Fragment != "" {
         parsedAuthURL, err := url.Parse(parsedURL.Fragment)
         if err != nil {
@@ -26,7 +27,7 @@ func main() {
         }
         log.Printf("[INFO] Authorization: %v", parsedAuthURL)
         go func() {
-            if err := handleAuthorization(parsedAuthURL, ipStore); err != nil {
+            if err := handleAuthorization(parsedAuthURL); err != nil {
                 log.Fatalf("[ERRO] Authorization: %v", err)
             }
         }()
@@ -35,7 +36,7 @@ func main() {
     for {
         switch parsedURL.Scheme {
         case "server":
-            if err := runServer(parsedURL, ipStore); err != nil {
+            if err := runServer(parsedURL); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
@@ -47,7 +48,7 @@ func main() {
                 continue
             }
         case "broker":
-            if err := runBroker(parsedURL, ipStore); err != nil {
+            if err := runBroker(parsedURL); err != nil {
                 log.Printf("[ERRO] Broker: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
