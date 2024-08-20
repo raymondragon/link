@@ -4,7 +4,6 @@ import (
     "net"
     "net/url"
     "strings"
-    "sync"
 )
 
 func runBroker(parsedURL *url.URL) error {
