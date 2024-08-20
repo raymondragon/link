@@ -3,6 +3,7 @@ package main
 import (
     "log"
     "os"
+    "strings"
     "time"
 )
 
@@ -15,11 +16,24 @@ func main() {
     if err != nil {
         log.Fatalf("[ERRO] URL Parsing: %v", err)
     }
-    log.Printf("[INFO] %v", parsedURL)
+    var ipStore sync.Map
+    if parsedURL.Fragment != "" {
+        parsedAuthURL := url.Parse(parsedURL.Fragment)
+        if err != nil {
+            log.Fatalf("[ERRO] URL Parsing: %v", err)
+        }
+        log.Printf("[INFO] Authorization: %v", parsedAuthURL)
+        go func() {
+            if err := handleAuthorization(parsedAuthURL, ipStore); err != nil {
+                log.Fatalf("[ERRO] Authorization: %v", err)
+            }
+        }()
+    }
+    log.Printf("[INFO] Transmissions: %v", strings.Split(parsedURL, "#")[0])
     for {
         switch parsedURL.Scheme {
         case "server":
-            if err := runServer(parsedURL); err != nil {
+            if err := runServer(parsedURL, ipStore); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
@@ -31,7 +45,7 @@ func main() {
                 continue
             }
         case "broker":
-            if err := runBroker(parsedURL); err != nil {
+            if err := runBroker(parsedURL, ipStore); err != nil {
                 log.Printf("[ERRO] Broker: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
