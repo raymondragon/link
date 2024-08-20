@@ -7,7 +7,7 @@ import (
     "sync"
 )
 
-func handleAuthorization(parsedURL *url.URL, ipStore sync.Map) error {
+func handleAuthorization(parsedURL *url.URL) error {
     http.HandleFunc(parsedURL.Path, func(w http.ResponseWriter, r *http.Request) {
         clientIP, _, err := net.SplitHostPort(r.RemoteAddr)
         if err != nil {
@@ -16,7 +16,7 @@ func handleAuthorization(parsedURL *url.URL, ipStore sync.Map) error {
         if _, err := w.Write([]byte(clientIP + "\n")); err != nil {
             return
         }
-        ipStore.Store(clientIP, struct{}{})
+        authorizedIP.Store(clientIP, struct{}{})
     })
     if parsedURL.Scheme == "http" {
         if err := http.ListenAndServe(parsedURL.Host, nil); err != nil {
