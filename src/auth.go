@@ -7,7 +7,7 @@ import (
     "sync"
 )
 
-func handleAuthorization(parsedURL *url.URL, ipStore *sync.Map) error {
+func handleAuthorization(parsedURL *url.URL, ipStore sync.Map) error {
     http.HandleFunc(parsedURL.Path, func(w http.ResponseWriter, r *http.Request) {
         clientIP, _, err := net.SplitHostPort(r.RemoteAddr)
         if err != nil {
