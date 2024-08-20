@@ -20,7 +20,7 @@ func main() {
     }
     var ipStore sync.Map
     if parsedURL.Fragment != "" {
-        parsedAuthURL := url.Parse(parsedURL.Fragment)
+        parsedAuthURL, err := url.Parse(parsedURL.Fragment)
         if err != nil {
             log.Fatalf("[ERRO] URL Parsing: %v", err)
         }
@@ -31,7 +31,7 @@ func main() {
             }
         }()
     }
-    log.Printf("[INFO] Transmissions: %v", strings.Split(parsedURL, "#")[0])
+    log.Printf("[INFO] Transmissions: %v", strings.Split(rawURL, "#")[0])
     for {
         switch parsedURL.Scheme {
         case "server":
