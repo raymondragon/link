@@ -7,7 +7,7 @@ import (
     "sync"
 )
 
-func runBroker(parsedURL *url.URL, ipStore sync.Map) error {
+func runBroker(parsedURL *url.URL) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -36,7 +36,7 @@ func runBroker(parsedURL *url.URL, ipStore sync.Map) error {
                 if err != nil {
                     return
                 }
-                if _, exists := ipStore.Load(clientIP); !exists {
+                if _, exists := authorizedIP.Load(clientIP); !exists {
                     linkConn.Close()
                     return
                 }
