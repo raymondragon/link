@@ -1,4 +1,4 @@
-package main
+package tls
 
 import (
     "crypto/rand"
@@ -9,9 +9,11 @@ import (
     "encoding/pem"
     "math/big"
     "time"
+
+    "github.com/caddyserver/certmagic"
 )
 
-func tlsConfigGeneration(hostname string) (*tls.Config, error) {
+func TLSConfigGeneration(hostname string) (*tls.Config, error) {
     private, err := rsa.GenerateKey(rand.Reader, 2048)
     if err != nil {
         return nil, err
@@ -42,4 +44,24 @@ func tlsConfigGeneration(hostname string) (*tls.Config, error) {
     }
     tlsConfig := &tls.Config{Certificates: []tls.Certificate{cert}}
     return tlsConfig, nil
+}
+
+func TLSConfigApplication(username, hostname string) (*tls.Config, error) {
+    certmagic.DefaultACME.CA = certmagic.LetsEncryptProductionCA
+    certmagic.DefaultACME.Agreed = true
+    mailAddr := username + "@" + hostname
+    if username == "" {
+        mailAddr = "acme@" + hostname
+    }
+    certmagic.DefaultACME.Email = mailAddr
+    tlsConfig, err := certmagic.TLS([]string{hostname})
+    return tlsConfig, err
+}
+
+func TLSConfigSetup(username, hostname string) (*tls.Config, error) {
+    tlsConfig, err := TLSConfigApplication(username, hostname)
+    if err != nil {
+        tlsConfig, err = TLSConfigGeneration(hostname)
+    }
+    return tlsConfig, err
 }
