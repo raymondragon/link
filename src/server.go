@@ -56,6 +56,6 @@ func runServer(parsedURL *url.URL, ipStore *sync.Map) error {
         targetConn.Close()
         return nil
     }
-    handleConnections(linkConn, targetConn)
+    handleTransmissions(linkConn, targetConn)
     return nil
 }
