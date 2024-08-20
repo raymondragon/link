@@ -4,9 +4,10 @@ import (
     "net"
     "net/url"
     "strings"
+    "sync"
 )
 
-func runBroker(parsedURL *url.URL) error {
+func runBroker(parsedURL *url.URL, ipStore *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -30,6 +31,14 @@ func runBroker(parsedURL *url.URL) error {
         semTEMP <- struct{}{}
         go func(linkConn net.Conn) {
             defer func() { <-semTEMP }()
+            clientIP, _, err := net.SplitHostPort(linkConn.RemoteAddr().String())
+            if err != nil {
+                return
+            }
+            if _, exists := ipStore.Load(clientIP); !exists {
+                linkConn.Close()
+                return
+            }
             targetConn, err := net.DialTCP("tcp", nil, targetAddr)
             if err != nil {
                 linkConn.Close()
