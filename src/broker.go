@@ -45,7 +45,7 @@ func runBroker(parsedURL *url.URL, ipStore *sync.Map) error {
                 return
             }
             targetConn.SetNoDelay(true)
-            handleConnections(linkConn, targetConn)
+            handleTransmissions(linkConn, targetConn)
         }(linkConn)
     }
 }
