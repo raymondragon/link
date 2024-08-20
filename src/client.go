@@ -26,6 +26,6 @@ func runClient(parsedURL *url.URL) error {
         return err
     }
     targetConn.SetNoDelay(true)
-    handleConnections(linkConn, targetConn)
+    handleTransmissions(linkConn, targetConn)
     return nil
 }
