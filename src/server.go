@@ -5,9 +5,10 @@ import (
     "net/url"
     "strings"
     "time"
+    "sync"
 )
 
-func runServer(parsedURL *url.URL) error {
+func runServer(parsedURL *url.URL, ipStore *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -47,7 +48,11 @@ func runServer(parsedURL *url.URL) error {
         return err
     }
     targetConn.SetNoDelay(true)
-    if linkConn == nil {
+    clientIP, _, err := net.SplitHostPort(targetConn.RemoteAddr().String())
+    if err != nil {
+        return err
+    }
+    if _, exists := ipStore.Load(clientIP); !exists || linkConn == nil {
         targetConn.Close()
         return nil
     }
