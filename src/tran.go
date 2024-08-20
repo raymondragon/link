@@ -5,7 +5,7 @@ import (
     "net"
 )
 
-func handleConnections(conn1, conn2 net.Conn) {
+func handleTransmissions(conn1, conn2 net.Conn) {
     done := make(chan struct{}, 2)
     go func() {
         defer conn1.Close()
