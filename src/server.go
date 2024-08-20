@@ -8,7 +8,7 @@ import (
     "sync"
 )
 
-func runServer(parsedURL *url.URL, ipStore *sync.Map) error {
+func runServer(parsedURL *url.URL, ipStore sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
