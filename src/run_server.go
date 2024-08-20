@@ -52,8 +52,9 @@ func runServer(parsedURL *url.URL) error {
         if err != nil {
             return err
         }
-        if _, exists := authorizedIP.Load(clientIP); !exists {
+        if _, exists := authorizedIP.Load(clientIP); !exists && linkConn != nil {
             targetConn.Close()
+            linkConn.Close()
             return nil
         }
     }
