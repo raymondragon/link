@@ -1,10 +1,8 @@
 FROM golang:alpine as builder
-WORKDIR /root
+WORKDIR /app
 ADD . .
-WORKDIR /root/src
-RUN go mod init link && go mod tidy
-RUN env CGO_ENABLED=0 go build -v -trimpath -ldflags '-w -s'
+RUN go mod init link && go mod tidy && \
+    go build -v -trimpath -ldflags '-w -s' -o /app/link ./cmd/link
 FROM scratch
-WORKDIR /
-COPY --from=builder /root/src/link .
+COPY --from=builder /app/link /link
 ENTRYPOINT ["/link"]
