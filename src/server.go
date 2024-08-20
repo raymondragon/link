@@ -8,7 +8,7 @@ import (
     "sync"
 )
 
-func runServer(parsedURL *url.URL, ipStore sync.Map) error {
+func runServer(parsedURL *url.URL) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -53,7 +53,7 @@ func runServer(parsedURL *url.URL, ipStore sync.Map) error {
         if err != nil {
             return err
         }
-        if _, exists := ipStore.Load(clientIP); !exists {
+        if _, exists := authorizedIP.Load(clientIP); !exists {
             targetConn.Close()
             return nil
         }
