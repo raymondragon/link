@@ -4,7 +4,6 @@ import (
     "net"
     "net/http"
     "net/url"
-    "sync"
 )
 
 func handleAuthorization(parsedURL *url.URL) error {
