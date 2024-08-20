@@ -5,7 +5,6 @@ import (
     "net/url"
     "strings"
     "time"
-    "sync"
 )
 
 func runServer(parsedURL *url.URL) error {
