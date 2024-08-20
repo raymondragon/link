@@ -53,10 +53,14 @@ func runServer(parsedURL *url.URL, ipStore *sync.Map) error {
         if err != nil {
             return err
         }
-        if _, exists := ipStore.Load(clientIP); !exists || linkConn == nil {
+        if _, exists := ipStore.Load(clientIP); !exists {
             targetConn.Close()
             return nil
         }
+    }
+    if linkConn == nil {
+        targetConn.Close()
+        return nil
     }
     handleTransmissions(linkConn, targetConn)
     return nil
