@@ -27,8 +27,12 @@ func main() {
         }
         log.Printf("[INFO] Authorization: %v", parsedAuthURL)
         go func() {
-            if err := handleAuthorization(parsedAuthURL); err != nil {
-                log.Fatalf("[ERRO] Authorization: %v", err)
+            for {
+                if err := handleAuthorization(parsedAuthURL); err != nil {
+                    log.Printf("[ERRO] Authorization: %v", err)
+                    time.Sleep(1 * time.Second)
+                    continue
+                }
             }
         }()
     }
