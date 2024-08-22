@@ -8,8 +8,8 @@ import (
     "sync"
     "time"
 
-    "github.com/raymondragon/link/internal/handle"
-    "github.com/raymondragon/link/internal/run"
+    "github.com/raymondragon/link/pkg/handle"
+    "github.com/raymondragon/link/pkg/run"
 )
 
 func main() {
