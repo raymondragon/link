@@ -4,6 +4,8 @@ import (
     "net"
     "net/url"
     "strings"
+
+    "github.com/raymondragon/link/pkg/handle"
 )
 
 func newClient(parsedURL *url.URL) error {
@@ -26,6 +28,6 @@ func newClient(parsedURL *url.URL) error {
         return err
     }
     targetConn.SetNoDelay(true)
-    handleTransmissions(linkConn, targetConn)
+    handle.transmissions(linkConn, targetConn)
     return nil
 }
