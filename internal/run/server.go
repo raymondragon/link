@@ -4,7 +4,7 @@ import (
     "net"
     "net/url"
     "strings"
-    "sycn"
+    "sync"
     "time"
 
     "github.com/raymondragon/link/internal/handle"
