@@ -5,6 +5,8 @@ import (
     "net/url"
     "strings"
     "time"
+
+    "github.com/raymondragon/link/pkg/handle"
 )
 
 func newServer(parsedURL *url.URL) error {
@@ -62,6 +64,6 @@ func newServer(parsedURL *url.URL) error {
         targetConn.Close()
         return nil
     }
-    handleTransmissions(linkConn, targetConn)
+    handle.transmissions(linkConn, targetConn)
     return nil
 }
