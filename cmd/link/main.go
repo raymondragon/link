@@ -5,14 +5,11 @@ import (
     "net/url"
     "os"
     "strings"
-    "sync"
     "time"
 
-    "github.com/raymondragon/link/pkg/handle"
-    "github.com/raymondragon/link/pkg/run"
+    "github.com/raymondragon/link/internal/handle"
+    "github.com/raymondragon/link/internal/run"
 )
-
-var authorizedIP sync.Map
 
 func main() {
     if len(os.Args) < 2 {
