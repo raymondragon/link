@@ -1,4 +1,4 @@
-package main
+package run
 
 import (
     "net"
@@ -6,7 +6,7 @@ import (
     "strings"
 )
 
-func runBroker(parsedURL *url.URL) error {
+func newBroker(parsedURL *url.URL) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
