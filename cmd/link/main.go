@@ -7,6 +7,9 @@ import (
     "strings"
     "sync"
     "time"
+
+    "github.com/raymondragon/link/handle"
+    "github.com/raymondragon/link/run"
 )
 
 var authorizedIP sync.Map
@@ -28,7 +31,7 @@ func main() {
         log.Printf("[INFO] Authorization: %v", parsedAuthURL)
         go func() {
             for {
-                if err := handleAuthorization(parsedAuthURL); err != nil {
+                if err := handle.authorization(parsedAuthURL); err != nil {
                     log.Printf("[ERRO] Authorization: %v", err)
                     time.Sleep(1 * time.Second)
                     continue
@@ -40,19 +43,19 @@ func main() {
     for {
         switch parsedURL.Scheme {
         case "server":
-            if err := runServer(parsedURL); err != nil {
+            if err := run.newServer(parsedURL); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "client":
-            if err := runClient(parsedURL); err != nil {
+            if err := run.newClient(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "broker":
-            if err := runBroker(parsedURL); err != nil {
+            if err := run.newBroker(parsedURL); err != nil {
                 log.Printf("[ERRO] Broker: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
