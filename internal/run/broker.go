@@ -4,11 +4,12 @@ import (
     "net"
     "net/url"
     "strings"
+    "sync"
 
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func newBroker(parsedURL *url.URL) error {
+func newBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
