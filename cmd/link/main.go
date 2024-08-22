@@ -30,7 +30,7 @@ func main() {
         log.Printf("[INFO] Authorization: %v", parsedAuthURL)
         go func() {
             for {
-                if err := handle.authorization(parsedAuthURL, &authorizedIP); err != nil {
+                if err := handle.Authorization(parsedAuthURL, &authorizedIP); err != nil {
                     log.Printf("[ERRO] Authorization: %v", err)
                     time.Sleep(1 * time.Second)
                     continue
@@ -42,19 +42,19 @@ func main() {
     for {
         switch parsedURL.Scheme {
         case "server":
-            if err := run.newServer(parsedURL, &authorizedIP); err != nil {
+            if err := run.NewServer(parsedURL, &authorizedIP); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "client":
-            if err := run.newClient(parsedURL); err != nil {
+            if err := run.NewClient(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "broker":
-            if err := run.newBroker(parsedURL, &authorizedIP); err != nil {
+            if err := run.NewBroker(parsedURL, &authorizedIP); err != nil {
                 log.Printf("[ERRO] Broker: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
