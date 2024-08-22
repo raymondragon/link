@@ -5,6 +5,7 @@ import (
     "net/url"
     "os"
     "strings"
+    "sync"
     "time"
 
     "github.com/raymondragon/link/internal/handle"
@@ -20,6 +21,7 @@ func main() {
     if err != nil {
         log.Fatalf("[ERRO] URL Parsing: %v", err)
     }
+    var authorizedIP sync.Map
     if parsedURL.Fragment != "" {
         parsedAuthURL, err := url.Parse(parsedURL.Fragment)
         if err != nil {
@@ -28,7 +30,7 @@ func main() {
         log.Printf("[INFO] Authorization: %v", parsedAuthURL)
         go func() {
             for {
-                if err := handle.authorization(parsedAuthURL); err != nil {
+                if err := handle.authorization(parsedAuthURL, &authorizedIP); err != nil {
                     log.Printf("[ERRO] Authorization: %v", err)
                     time.Sleep(1 * time.Second)
                     continue
@@ -40,7 +42,7 @@ func main() {
     for {
         switch parsedURL.Scheme {
         case "server":
-            if err := run.newServer(parsedURL); err != nil {
+            if err := run.newServer(parsedURL, &authorizedIP); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
@@ -52,7 +54,7 @@ func main() {
                 continue
             }
         case "broker":
-            if err := run.newBroker(parsedURL); err != nil {
+            if err := run.newBroker(parsedURL, &authorizedIP); err != nil {
                 log.Printf("[ERRO] Broker: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
