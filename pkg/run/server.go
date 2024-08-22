@@ -10,7 +10,7 @@ import (
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func newServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
+func NewServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -65,6 +65,6 @@ func newServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
         targetConn.Close()
         return nil
     }
-    handle.transmissions(linkConn, targetConn)
+    handle.Transmissions(linkConn, targetConn)
     return nil
 }
