@@ -8,6 +8,8 @@
 
 - **Authorization Handling**: By IP address handling, Link ensures only authorized users gain access to sensitive resources.
 
+- **Automated Certificate**: Uses Certmagic for seamless, automatic certificate issuance and renewal with domain available.
+
 - **In-Memory Certificate**: Provides a self-signed HTTPS certificate with a one-year validity, stored entirely in memory.
 
 - **Auto Reconnection**: Providing robust short-term reconnection capabilities, ensuring uninterrupted service.
@@ -29,8 +31,8 @@ broker://linkAddr/targetAddr
 Note that only `server` and  `broker` mode support authorization Handling, which you can just add auth entry after `#`. For example:
 
 ```
-server://linkAddr/targetAddr#authScheme//authAddr/secretPath
-broker://linkAddr/targetAddr#authScheme//authAddr/secretPath
+server://linkAddr/targetAddr#authScheme://authAddr/secretPath
+broker://linkAddr/targetAddr#authScheme://authAddr/secretPath
 ```
 
 - **authScheme**: The option allows you to choose between using HTTP or HTTPS.
@@ -53,10 +55,10 @@ broker://linkAddr/targetAddr#authScheme//authAddr/secretPath
 **Run as Server with authorization**
 
 ```bash
-./link server://:10101/:10022#https://:8443/server
+./link server://:10101/:10022#https://hostname:8443/server
 ```
 
-- The server handles authorization at `https://server_ip:8443/server`, on your visit and your IP logged.
+- The server handles authorization at `https://hostname:8443/server`, on your visit and your IP logged.
 - The server will listen for client connections on port `10101` , listen and forward data to port `10022`.
 
 ### Client Mode
@@ -67,10 +69,10 @@ broker://linkAddr/targetAddr#authScheme//authAddr/secretPath
 **Run as Client**
 
 ```bash
-./link client://server_ip:10101/127.0.0.1:22
+./link client://server_hostname_or_IP:10101/127.0.0.1:22
 ```
 
-- This command will establish link with `server_ip:10101` , connect and forward data to `127.0.0.1:22`.
+- This command will establish link with `server_hostname_or_IP:10101` , connect and forward data to `127.0.0.1:22`.
 
 ### Broker Mode
 
@@ -88,10 +90,10 @@ broker://linkAddr/targetAddr#authScheme//authAddr/secretPath
 **Run as Broker with authorization**
 
 ```bash
-./link broker://:10101/127.0.0.1:22#https://:8443/broker
+./link broker://:10101/127.0.0.1:22#https://hostname:8443/broker
 ```
 
-- The server handles authorization at `https://server_ip:8443/broker`, on your visit and your IP logged.
+- The server handles authorization at `https://hostname:8443/broker`, on your visit and your IP logged.
 - The server will listen for client connections on port `10101` , connect and forward data to `127.0.0.1:22`.
 
 ## Container Usage
@@ -101,7 +103,7 @@ You can also run **Link** using a Docker container. The image is available at [g
 To run the container in server mode with or without authorization:
 
 ```bash
-docker run --rm ghcr.io/raymondragon/link server://:10101/:10022#https://:8443/server
+docker run --rm ghcr.io/raymondragon/link server://:10101/:10022#https://hostname:8443/server
 ```
 
 ```bash
@@ -111,13 +113,13 @@ docker run --rm ghcr.io/raymondragon/link server://:10101/:10022
 To run the container in client mode:
 
 ```bash
-docker run --rm ghcr.io/raymondragon/link client://server_ip:10101/127.0.0.1:22
+docker run --rm ghcr.io/raymondragon/link client://server_hostname_or_IP:10101/127.0.0.1:22
 ```
 
 To run the container in server mode with or without authorization:
 
 ```bash
-docker run --rm ghcr.io/raymondragon/link broker://:10101/127.0.0.1:22#https://:8443/broker
+docker run --rm ghcr.io/raymondragon/link broker://:10101/127.0.0.1:22#https://hostname:8443/broker
 ```
 
 ```bash
