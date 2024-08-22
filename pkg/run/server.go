@@ -7,7 +7,7 @@ import (
     "time"
 )
 
-func runServer(parsedURL *url.URL) error {
+func newServer(parsedURL *url.URL) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
