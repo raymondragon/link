@@ -4,12 +4,13 @@ import (
     "net"
     "net/url"
     "strings"
+    "sycn"
     "time"
 
-    "github.com/raymondragon/link/pkg/handle"
+    "github.com/raymondragon/link/internal/handle"
 )
 
-func newServer(parsedURL *url.URL) error {
+func newServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
