@@ -5,7 +5,7 @@ import (
     "net/url"
     "strings"
 
-    "github.com/raymondragon/link/internal/handle"
+    "github.com/raymondragon/link/pkg/handle"
 )
 
 func newClient(parsedURL *url.URL) error {
