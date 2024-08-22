@@ -1,4 +1,4 @@
-package main
+package handle
 
 import (
     "net"
@@ -6,7 +6,7 @@ import (
     "net/url"
 )
 
-func handleAuthorization(parsedURL *url.URL) error {
+func authorization(parsedURL *url.URL) error {
     http.HandleFunc(parsedURL.Path, func(w http.ResponseWriter, r *http.Request) {
         clientIP, _, err := net.SplitHostPort(r.RemoteAddr)
         if err != nil {
