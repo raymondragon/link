@@ -4,6 +4,8 @@ import (
     "net"
     "net/url"
     "strings"
+
+    "github.com/raymondragon/link/pkg/handle"
 )
 
 func newBroker(parsedURL *url.URL) error {
@@ -46,7 +48,7 @@ func newBroker(parsedURL *url.URL) error {
                 return
             }
             targetConn.SetNoDelay(true)
-            handleTransmissions(linkConn, targetConn)
+            handle.transmissions(linkConn, targetConn)
         }(linkConn)
     }
 }
