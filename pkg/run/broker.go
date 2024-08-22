@@ -9,7 +9,7 @@ import (
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func newBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
+func NewBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -49,7 +49,7 @@ func newBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
                 return
             }
             targetConn.SetNoDelay(true)
-            handle.transmissions(linkConn, targetConn)
+            handle.Transmissions(linkConn, targetConn)
         }(linkConn)
     }
 }
