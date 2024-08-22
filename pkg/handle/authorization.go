@@ -9,7 +9,7 @@ import (
     "github.com/raymondragon/link/pkg/tlsconfig"
 )
 
-func authorization(parsedURL *url.URL, authorizedIP *sync.Map) error {
+func Authorization(parsedURL *url.URL, authorizedIP *sync.Map) error {
     http.HandleFunc(parsedURL.Path, func(w http.ResponseWriter, r *http.Request) {
         clientIP, _, err := net.SplitHostPort(r.RemoteAddr)
         if err != nil {
