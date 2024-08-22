@@ -7,7 +7,7 @@ import (
     "sync"
     "time"
 
-    "github.com/raymondragon/link/internal/handle"
+    "github.com/raymondragon/link/pkg/handle"
 )
 
 func newServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
