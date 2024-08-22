@@ -1,4 +1,4 @@
-package main
+package tlsconfig
 
 import (
     "crypto/rand"
@@ -11,7 +11,7 @@ import (
     "time"
 )
 
-func tlsConfigGeneration(hostname string) (*tls.Config, error) {
+func Generation(hostname string) (*tls.Config, error) {
     private, err := rsa.GenerateKey(rand.Reader, 2048)
     if err != nil {
         return nil, err
