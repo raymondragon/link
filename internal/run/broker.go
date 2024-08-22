@@ -6,7 +6,7 @@ import (
     "strings"
     "sync"
 
-    "github.com/raymondragon/link/pkg/handle"
+    "github.com/raymondragon/link/internal/handle"
 )
 
 func newBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
