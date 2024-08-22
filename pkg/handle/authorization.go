@@ -4,6 +4,8 @@ import (
     "net"
     "net/http"
     "net/url"
+
+    "github.com/raymondragon/link/pkg/tlsconfig"
 )
 
 func authorization(parsedURL *url.URL) error {
@@ -22,7 +24,7 @@ func authorization(parsedURL *url.URL) error {
             return err
         }
     } else {
-        tlsConfig, err := tlsConfigGeneration(parsedURL.Hostname())
+        tlsConfig, err := tlsconfig.Setup(parsedURL.User.Username(), parsedURL.Hostname())
         if err != nil {
             return err
         }
