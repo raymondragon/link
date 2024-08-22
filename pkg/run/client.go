@@ -8,7 +8,7 @@ import (
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func newClient(parsedURL *url.URL) error {
+func NewClient(parsedURL *url.URL) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -28,6 +28,6 @@ func newClient(parsedURL *url.URL) error {
         return err
     }
     targetConn.SetNoDelay(true)
-    handle.transmissions(linkConn, targetConn)
+    handle.Transmissions(linkConn, targetConn)
     return nil
 }
