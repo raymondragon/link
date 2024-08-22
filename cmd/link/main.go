@@ -8,8 +8,8 @@ import (
     "sync"
     "time"
 
-    "github.com/raymondragon/link/handle"
-    "github.com/raymondragon/link/run"
+    "github.com/raymondragon/link/pkg/handle"
+    "github.com/raymondragon/link/pkg/run"
 )
 
 var authorizedIP sync.Map
