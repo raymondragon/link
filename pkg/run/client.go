@@ -29,13 +29,6 @@ func NewClient(parsedURL *url.URL) error {
         return err
     }
     targetConn.SetNoDelay(true)
-    go handle.Transmissions(linkConn, targetConn)
-    buffer := make([]byte, 1024)
-    for {
-        targetConn.SetReadDeadline(time.Now().Add(10 * time.Second))
-        if _, err := targetConn.Read(buffer); err != nil {
-            break
-        }
-    }
+    handle.Transmissions(linkConn, targetConn)
     return nil
 }
