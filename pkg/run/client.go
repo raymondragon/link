@@ -4,7 +4,6 @@ import (
     "net"
     "net/url"
     "strings"
-    "time"
 
     "github.com/raymondragon/link/pkg/handle"
 )
