@@ -36,6 +36,7 @@ func NewClient(parsedURL *url.URL) error {
             if _, err := targetConn.Read(buffer); err != nil {
                 if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
                     targetConn.Close()
+                    linkConn.Close()
                     return
                 }
                 continue
