@@ -5,9 +5,9 @@ import (
 )
 
 func Setup(username, hostname string) (*tls.Config, error) {
-    tlsConfig, err := Application(username, hostname)
+    tlsConfig, err := Register(username, hostname)
     if err != nil {
-        tlsConfig, err = Generation(hostname)
+        tlsConfig, err = Generate(hostname)
     }
     return tlsConfig, err
 }
