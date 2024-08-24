@@ -9,7 +9,7 @@ import (
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func NewBroker(parsedURL *url.URL, whiteList *sync.Map) error {
+func Broker(parsedURL *url.URL, whiteList *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
