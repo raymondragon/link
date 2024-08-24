@@ -9,7 +9,7 @@ import (
     "time"
 
     "github.com/raymondragon/link/pkg/handle"
-    "github.com/raymondragon/link/pkg/run"
+    "github.com/raymondragon/link/pkg/mode"
 )
 
 func main() {
@@ -19,42 +19,44 @@ func main() {
     rawURL := os.Args[1]
     parsedURL, err := url.Parse(rawURL)
     if err != nil {
-        log.Fatalf("[ERRO] URL Parsing: %v", err)
+        log.Fatalf("[ERRO] URL: %v", err)
     }
-    var authorizedIP sync.Map
+    var whiteList sync.Map
     if parsedURL.Fragment != "" {
         parsedAuthURL, err := url.Parse(parsedURL.Fragment)
         if err != nil {
-            log.Fatalf("[ERRO] URL Parsing: %v", err)
+            log.Fatalf("[ERRO] URL: %v", err)
         }
-        log.Printf("[INFO] Authorization: %v", parsedAuthURL)
+        log.Printf("[INFO] Auth: %v", parsedAuthURL)
         go func() {
             for {
-                if err := handle.Authorization(parsedAuthURL, &authorizedIP); err != nil {
-                    log.Printf("[ERRO] Authorization: %v", err)
+                if err := handle.Auth(parsedAuthURL, &whiteList); err != nil {
+                    log.Printf("[ERRO] Auth: %v", err)
                     time.Sleep(1 * time.Second)
                     continue
                 }
             }
         }()
     }
-    log.Printf("[INFO] Transmissions: %v", strings.Split(rawURL, "#")[0])
     for {
         switch parsedURL.Scheme {
         case "server":
-            if err := run.NewServer(parsedURL, &authorizedIP); err != nil {
+            log.Printf("[INFO] Server: %v", strings.Split(rawURL, "#")[0])
+            if err := mode.Server(parsedURL, &whiteList); err != nil {
                 log.Printf("[ERRO] Server: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "client":
-            if err := run.NewClient(parsedURL); err != nil {
+            log.Printf("[INFO] Client: %v", strings.Split(rawURL, "#")[0])
+            if err := mode.Client(parsedURL); err != nil {
                 log.Printf("[ERRO] Client: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
             }
         case "broker":
-            if err := run.NewBroker(parsedURL, &authorizedIP); err != nil {
+            log.Printf("[INFO] Broker: %v", strings.Split(rawURL, "#")[0])
+            if err := mode.Broker(parsedURL, &whiteList); err != nil {
                 log.Printf("[ERRO] Broker: %v", err)
                 time.Sleep(1 * time.Second)
                 continue
