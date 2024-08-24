@@ -1,4 +1,4 @@
-package run
+package mode
 
 import (
     "net"
@@ -10,7 +10,7 @@ import (
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func NewServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
+func Server(parsedURL *url.URL, whiteList *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -54,7 +54,7 @@ func NewServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
         if err != nil {
             return err
         }
-        if _, exists := authorizedIP.Load(clientIP); !exists && linkConn != nil {
+        if _, exists := whiteList.Load(clientIP); !exists && linkConn != nil {
             targetConn.Close()
             linkConn.Close()
             return nil
@@ -64,6 +64,6 @@ func NewServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
         targetConn.Close()
         return nil
     }
-    handle.Transmissions(linkConn, targetConn)
+    handle.Conn(linkConn, targetConn)
     return nil
 }
