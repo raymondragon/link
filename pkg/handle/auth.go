@@ -25,7 +25,7 @@ func Auth(parsedURL *url.URL, whiteList *sync.Map) error {
             return err
         }
     } else {
-        tlsConfig, err := tlsconfig.Setup(parsedURL.User.Username(), parsedURL.Hostname())
+        tlsConfig, err := autotls.Setup(parsedURL.User.Username(), parsedURL.Hostname())
         if err != nil {
             return err
         }
