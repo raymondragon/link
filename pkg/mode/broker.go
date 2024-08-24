@@ -1,4 +1,4 @@
-package run
+package mode
 
 import (
     "net"
@@ -9,7 +9,7 @@ import (
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func NewBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
+func NewBroker(parsedURL *url.URL, whiteList *sync.Map) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -38,7 +38,7 @@ func NewBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
                 if err != nil {
                     return
                 }
-                if _, exists := authorizedIP.Load(clientIP); !exists {
+                if _, exists := whiteList.Load(clientIP); !exists {
                     linkConn.Close()
                     return
                 }
@@ -49,7 +49,7 @@ func NewBroker(parsedURL *url.URL, authorizedIP *sync.Map) error {
                 return
             }
             targetConn.SetNoDelay(true)
-            handle.Transmissions(linkConn, targetConn)
+            handle.Conn(linkConn, targetConn)
         }(linkConn)
     }
 }
