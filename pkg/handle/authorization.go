@@ -6,7 +6,7 @@ import (
     "net/url"
     "sync"
 
-    "github.com/raymondragon/link/pkg/tlsconfig"
+    "github.com/raymondragon/link/pkg/autotls"
 )
 
 func Authorization(parsedURL *url.URL, authorizedIP *sync.Map) error {
