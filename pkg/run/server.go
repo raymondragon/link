@@ -42,7 +42,6 @@ func NewServer(parsedURL *url.URL, authorizedIP *sync.Map) error {
             }
             linkConn = tempConn
             linkConn.SetNoDelay(true)
-            time.Sleep(1 * time.Second)
         }
     }()
     targetConn, err := targetListen.AcceptTCP()
