@@ -11,7 +11,7 @@ import (
     "time"
 )
 
-func Generation(hostname string) (*tls.Config, error) {
+func Generate(hostname string) (*tls.Config, error) {
     private, err := rsa.GenerateKey(rand.Reader, 2048)
     if err != nil {
         return nil, err
