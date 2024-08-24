@@ -9,7 +9,7 @@ import (
     "github.com/raymondragon/link/pkg/autotls"
 )
 
-func Authorization(parsedURL *url.URL, authorizedIP *sync.Map) error {
+func Auth(parsedURL *url.URL, whiteList *sync.Map) error {
     http.HandleFunc(parsedURL.Path, func(w http.ResponseWriter, r *http.Request) {
         clientIP, _, err := net.SplitHostPort(r.RemoteAddr)
         if err != nil {
@@ -18,7 +18,7 @@ func Authorization(parsedURL *url.URL, authorizedIP *sync.Map) error {
         if _, err := w.Write([]byte(clientIP + "\n")); err != nil {
             return
         }
-        authorizedIP.Store(clientIP, struct{}{})
+        whiteList.Store(clientIP, struct{}{})
     })
     if parsedURL.Scheme == "http" {
         if err := http.ListenAndServe(parsedURL.Host, nil); err != nil {
