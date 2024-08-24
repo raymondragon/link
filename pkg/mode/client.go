@@ -1,4 +1,4 @@
-package run
+package mode
 
 import (
     "net"
@@ -8,7 +8,7 @@ import (
     "github.com/raymondragon/link/pkg/handle"
 )
 
-func NewClient(parsedURL *url.URL) error {
+func Client(parsedURL *url.URL) error {
     linkAddr, err := net.ResolveTCPAddr("tcp", parsedURL.Host)
     if err != nil {
         return err
@@ -28,6 +28,6 @@ func NewClient(parsedURL *url.URL) error {
         return err
     }
     targetConn.SetNoDelay(true)
-    handle.Transmissions(linkConn, targetConn)
+    handle.Conn(linkConn, targetConn)
     return nil
 }
