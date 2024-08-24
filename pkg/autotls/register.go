@@ -20,14 +20,14 @@ import (
     "github.com/caddyserver/certmagic"
 )
 
-func Application(username, hostname string) (*tls.Config, error) {
+func Register(username, hostname string) (*tls.Config, error) {
     certmagic.DefaultACME.CA = certmagic.LetsEncryptProductionCA
     certmagic.DefaultACME.Agreed = true
-    mainAddr := username + "@" + hostname
+    mailAddr := username + "@" + hostname
     if username == "" {
-        mainAddr = "no-reply@" + hostname
+        mailAddr = "no-reply@" + hostname
     }
-    certmagic.DefaultACME.Email = mainAddr
+    certmagic.DefaultACME.Email = mailAddr
     tlsConfig, err := certmagic.TLS([]string{hostname})
     return tlsConfig, err
 }
