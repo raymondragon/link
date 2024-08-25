@@ -29,7 +29,8 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
         return err
     }
     defer targetListen.Close()
-    var linkConn *net.TCPConn
+    linkChan := make(chan *net.TCPConn)
+    targetChan := make(chan *net.TCPConn)
     go func() {
         for {
             tempConn, err := linkListen.AcceptTCP()
@@ -37,33 +38,38 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
                 time.Sleep(1 * time.Second)
                 continue
             }
-            if linkConn != nil {
-                linkConn.Close()
-            }
-            linkConn = tempConn
-            linkConn.SetNoDelay(true)
+            tempConn.SetNoDelay(true)
+            linkChan <- tempConn
         }
     }()
-    targetConn, err := targetListen.AcceptTCP()
-    if err != nil {
-        return err
-    }
-    targetConn.SetNoDelay(true)
-    if parsedURL.Fragment != "" {
-        clientIP, _, err := net.SplitHostPort(targetConn.RemoteAddr().String())
-        if err != nil {
-            return err
+    go func() {
+        for {
+            tempConn, err := targetListen.AcceptTCP()
+            if err != nil {
+                time.Sleep(1 * time.Second)
+                continue
+            }
+            tempConn.SetNoDelay(true)
+            targetChan <- tempConn
         }
-        if _, exists := whiteList.Load(clientIP); !exists && linkConn != nil {
-            targetConn.Close()
-            linkConn.Close()
-            return nil
-        }
+    }()
+    tempSlot := make(chan struct{}, 1024)
+    for {
+        linkConn := <-linkConnChan
+        tempSlot <- struct{}{}
+        go func(linkConn *net.TCPConn) {
+            defer func() { <-tempSlot }()
+            targetConn := <-targetChan
+            if parsedURL.Fragment != "" {
+                clientIP, _, err := net.SplitHostPort(targetConn.RemoteAddr().String())
+                if err != nil {
+                    return
+                }
+                if _, exists := whiteList.Load(clientIP); !exists {
+                    return
+                }
+            }
+            handle.Conn(linkConn, targetConn)
+        }(linkConn)
     }
-    if linkConn == nil {
-        targetConn.Close()
-        return nil
-    }
-    handle.Conn(linkConn, targetConn)
-    return nil
 }
