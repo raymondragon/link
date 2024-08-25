@@ -17,17 +17,23 @@ func Client(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    linkConn, err := net.DialTCP("tcp", nil, linkAddr)
-    if err != nil {
-        return err
+    tempSlot := make(chan struct{}, 5)
+    for {
+        linkConn, err := net.DialTCP("tcp", nil, linkAddr)
+        if err != nil {
+            continue
+        }
+        linkConn.SetNoDelay(true)
+        targetConn, err := net.DialTCP("tcp", nil, targetAddr)
+        if err != nil {
+            linkConn.Close()
+            continue
+        }
+        targetConn.SetNoDelay(true)
+        tempSlot <- struct{}{}
+        go func(linkConn, targetConn *net.TCPConn) {
+            defer func() { <-tempSlot }()
+            handle.Conn(linkConn, targetConn)
+        }(linkConn, targetConn)
     }
-    linkConn.SetNoDelay(true)
-    targetConn, err := net.DialTCP("tcp", nil, targetAddr)
-    if err != nil {
-        linkConn.Close()
-        return err
-    }
-    targetConn.SetNoDelay(true)
-    handle.Conn(linkConn, targetConn)
-    return nil
 }
