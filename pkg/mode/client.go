@@ -36,6 +36,7 @@ func Client(parsedURL *url.URL) error {
             }
             targetConn.SetNoDelay(true)
             handle.Conn(linkConn, targetConn)
+            return nil
         }
     }
     return nil
