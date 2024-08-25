@@ -18,7 +18,7 @@ func Client(parsedURL *url.URL) error {
     if err != nil {
         return err
     }
-    tempSlot := make(chan struct{}, 5)
+    tempSlot := make(chan struct{}, 10)
     for {
         linkConn, err := net.DialTCP("tcp", nil, linkAddr)
         if err != nil {
