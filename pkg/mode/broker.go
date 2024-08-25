@@ -23,16 +23,16 @@ func Broker(parsedURL *url.URL, whiteList *sync.Map) error {
         return err
     }
     defer linkListen.Close()
-    semTEMP := make(chan struct{}, 1024)
+    tempSlot := make(chan struct{}, 1024)
     for {
         linkConn, err := linkListen.AcceptTCP()
         if err != nil {
             continue
         }
         linkConn.SetNoDelay(true)
-        semTEMP <- struct{}{}
+        tempSlot <- struct{}{}
         go func(linkConn net.Conn) {
-            defer func() { <-semTEMP }()
+            defer func() { <-tempSlot }()
             if parsedURL.Fragment != "" {
                 clientIP, _, err := net.SplitHostPort(linkConn.RemoteAddr().String())
                 if err != nil {
