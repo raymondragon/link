@@ -41,6 +41,7 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
                 linkConn.Close()
             }
             linkConn = tempConn
+            defer linkConn.Close()
             linkConn.SetNoDelay(true)
         }
     }()
@@ -48,6 +49,7 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
     if err != nil {
         return err
     }
+    defer targetConn.Close()
     targetConn.SetNoDelay(true)
     if parsedURL.Fragment != "" {
         clientIP, _, err := net.SplitHostPort(targetConn.RemoteAddr().String())
@@ -55,16 +57,10 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
             return err
         }
         if _, exists := whiteList.Load(clientIP); !exists && linkConn != nil {
-            targetConn.Close()
-            linkConn.Close()
             return nil
         }
     }
-    if linkConn == nil {
-        targetConn.Close()
-        return nil
-    }
-    if _, err = linkConn.Write([]byte("targetConn")); err !=nil {
+    if _, err = linkConn.Write([]byte("targetConn")); err !=nil || linkConn == nil {
         return nil
     }
     handle.Conn(linkConn, targetConn)
