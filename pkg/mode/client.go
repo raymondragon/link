@@ -4,6 +4,7 @@ import (
     "net"
     "net/url"
     "strings"
+    "time"
 
     "github.com/raymondragon/link/pkg/handle"
 )
@@ -21,12 +22,14 @@ func Client(parsedURL *url.URL) error {
     for {
         linkConn, err := net.DialTCP("tcp", nil, linkAddr)
         if err != nil {
+            time.Sleep(1 * time.Second)
             continue
         }
         linkConn.SetNoDelay(true)
         targetConn, err := net.DialTCP("tcp", nil, targetAddr)
         if err != nil {
             linkConn.Close()
+            time.Sleep(1 * time.Second)
             continue
         }
         targetConn.SetNoDelay(true)
