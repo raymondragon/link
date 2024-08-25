@@ -55,7 +55,7 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
     }()
     tempSlot := make(chan struct{}, 1024)
     for {
-        linkConn := <-linkConnChan
+        linkConn := <-linkChan
         tempSlot <- struct{}{}
         go func(linkConn *net.TCPConn) {
             defer func() { <-tempSlot }()
