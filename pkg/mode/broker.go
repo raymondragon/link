@@ -36,6 +36,7 @@ func Broker(parsedURL *url.URL, whiteList *sync.Map) error {
             if parsedURL.Fragment != "" {
                 clientIP, _, err := net.SplitHostPort(linkConn.RemoteAddr().String())
                 if err != nil {
+                    linkConn.Close()
                     return
                 }
                 if _, exists := whiteList.Load(clientIP); !exists {
