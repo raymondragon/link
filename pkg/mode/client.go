@@ -22,25 +22,12 @@ func Client(parsedURL *url.URL) error {
         return err
     }
     linkConn.SetNoDelay(true)
-    tempBuff := make([]byte, 1024)
-    n, err := linkConn.Read(tempBuff)
+    targetConn, err := net.DialTCP("tcp", nil, targetAddr)
     if err != nil {
         linkConn.Close()
         return err
     }
-    if string(tempBuff[:n]) == "targetConn" {
-        targetConn, err := net.DialTCP("tcp", nil, targetAddr)
-        if err != nil {
-            linkConn.Close()
-            return err
-        }
-        targetConn.SetNoDelay(true)
-        if _, err := linkConn.Write([]byte("targetReady")); err != nil {
-            targetConn.Close()
-            linkConn.Close()
-            return err
-        }
-        handle.Conn(linkConn, targetConn)
-    }
+    targetConn.SetNoDelay(true)
+    handle.Conn(linkConn, targetConn)
     return nil
 }
