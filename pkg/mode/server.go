@@ -67,5 +67,6 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
     if _, err := linkConn.Write([]byte("targetConn")); err != nil {
         return nil
     }
-    return handle.Conn(linkConn, targetConn)
+    handle.Conn(linkConn, targetConn)
+    return nil
 }
