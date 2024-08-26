@@ -35,6 +35,11 @@ func Client(parsedURL *url.URL) error {
             return err
         }
         targetConn.SetNoDelay(true)
+        if _, err := linkConn.Write([]byte("targetReady")); err != nil {
+            targetConn.Close()
+            linkConn.Close()
+            return err
+        }
         handle.Conn(linkConn, targetConn)
     }
     return nil
