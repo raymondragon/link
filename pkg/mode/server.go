@@ -41,7 +41,6 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
                 linkConn.Close()
             }
             linkConn = tempConn
-            defer linkConn.Close()
             linkConn.SetNoDelay(true)
         }
     }()
