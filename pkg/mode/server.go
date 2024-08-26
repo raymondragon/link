@@ -30,6 +30,11 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
     }
     defer targetListen.Close()
     var linkConn *net.TCPConn
+    defer func() {
+        if linkConn != nil {
+            linkConn.Close()
+        }
+    }()
     go func() {
         for {
             tempConn, err := linkListen.AcceptTCP()
@@ -59,10 +64,8 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
             return nil
         }
     }
-    if linkConn == nil || _, err := linkConn.Write([]byte("targetConn")); err != nil {
+    if _, err := linkConn.Write([]byte("targetConn")); err != nil {
         return nil
     }
-    handle.Conn(linkConn, targetConn)
-    linkConn.Close()
-    return nil
+    return handle.Conn(linkConn, targetConn)
 }
