@@ -5,7 +5,6 @@ import (
     "net/url"
     "strings"
     "sync"
-    "time"
 
     "github.com/raymondragon/link/pkg/handle"
 )
