@@ -29,21 +29,11 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
         return err
     }
     defer targetListen.Close()
-    var linkConn *net.TCPConn
-    go func() {
-        for {
-            tempConn, err := linkListen.AcceptTCP()
-            if err != nil {
-                time.Sleep(1 * time.Second)
-                continue
-            }
-            if linkConn != nil {
-                linkConn.Close()
-            }
-            linkConn = tempConn
-            linkConn.SetNoDelay(true)
-        }
-    }()
+    linkConn, err := linkListen.AcceptTCP()
+    if err != nil {
+        return err
+    }
+    linkConn.SetNoDelay(true)
     targetConn, err := targetListen.AcceptTCP()
     if err != nil {
         return err
