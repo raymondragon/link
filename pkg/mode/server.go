@@ -59,9 +59,10 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
             return nil
         }
     }
-    if _, err = linkConn.Write([]byte("targetConn")); err !=nil || linkConn == nil {
+    if linkConn == nil || _, err := linkConn.Write([]byte("targetConn")); err != nil {
         return nil
     }
     handle.Conn(linkConn, targetConn)
+    linkConn.Close()
     return nil
 }
