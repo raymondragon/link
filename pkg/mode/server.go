@@ -69,6 +69,15 @@ func Server(parsedURL *url.URL, whiteList *sync.Map) error {
         linkConn.Close()
         return err
     }
-    handle.Conn(linkConn, targetConn)
+    tempBuff := make([]byte, 1024)
+    n, err := linkConn.Read(tempBuff)
+    if err != nil {
+        targetConn.Close()
+        linkConn.Close()
+        return err
+    }
+    if string(tempBuff[:n]) == "targetReady" {
+        handle.Conn(linkConn, targetConn)
+    }
     return nil
 }
