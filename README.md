@@ -129,3 +129,7 @@ docker run --rm ghcr.io/raymondragon/link broker://:10101/127.0.0.1:22
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Sponsor
+
+This project is tested under the development environment provided by [Alice Networks](https://alicenetworks.net).
